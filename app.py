@@ -6,6 +6,7 @@ import hmac
 import requests
 import pytz
 import argparse
+import json
 
 import logs as logs 
 from __init__ import __version__
@@ -276,7 +277,4 @@ if __name__ == "__main__":
 
     res = requests.request(http_method, url, headers=auth)
 
-    print(url)
-    print(auth)
-    print(res.status_code)
-    print(res.text)
+    logs.log_info(json.dumps(json.loads(res.text), indent=4))
