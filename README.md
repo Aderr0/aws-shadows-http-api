@@ -20,7 +20,7 @@ In the TODO list of this repo, there are :
 1. Clone the repo
 2. Copy the file ```conf.template``` and rename it for something else (conf.Aderr0 for example)
 3. Open ```constants``` file and complete it
-3. Execute the script ```script.sh``` (with -d to execute with logs)
+3. Execute the script ```script.sh``` with your configuration file name as parameter
 
 ### UPDATE a Shadow
 
