@@ -1,4 +1,4 @@
-botocore_auth.py
 __pycache__
-conf*
-!conf.template
+
+*conf*
+!template.conf
