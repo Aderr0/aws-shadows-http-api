@@ -10,19 +10,120 @@ import json
 
 import logs as logs 
 from __init__ import __version__
+from canonical_request import CanonicalRequest
 
-SERVICE = ""
 
-THING_NAME = ""
-REGION = ""
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
+class Credentials:
+    def __init__(self, aws_access_key_id = "", aws_secret_access_key = "") -> None:
+        self.aws_access_key_id: str = aws_access_key_id
+        self.aws_secret_access_key: str = aws_secret_access_key
 
-parser = argparse.ArgumentParser("ShadowHttpApi", description="Manipulating AWS shadow using HTTP API and only natives python's modules")
-parser.add_argument("-t", "--thing-name", required=True)
-parser.add_argument("-r", "--region", default="eu-west-1", required=False)
-parser.add_argument("-a", "--aws-access-key-id", required=True)
-parser.add_argument("-s", "--aws-secret-access-key", required=True)
+    def get_aws_access_key_id(self) -> str:
+        return self.aws_access_key_id
+
+    def get_aws_secret_access_key(self) -> str:
+        return self.aws_secret_access_key
+
+    def set_credentials(self, aws_access_key_id, aws_secret_access_key) -> None:
+        self.aws_access_key_id = aws_access_key_id
+        self.aws_secret_access_key = aws_secret_access_key
+
+class CreateRequest:
+    """Class to generate http request with authorization header"""
+
+    def __init__(self) -> None:
+        self.service: str = "iotdata"
+
+        self.thing_name: str = ""
+        self.region: str = ""
+        self.credentials: Credentials = Credentials()
+
+        self.canonical_request = None
+        self.canonical_request_hash = None
+
+
+    ######################################
+    # INIT CONTEXT REQUEST
+    ######################################
+
+    def __parser_cmd_line(self) -> dict:
+        parser = self.__init_argparse()
+        args = parser.parse_args()
+        return args
+
+    def __init_argparse(self) -> argparse.ArgumentParser:
+        parser = argparse.ArgumentParser(
+            "ShadowHttpApi", 
+            description="Manipulating AWS shadow using HTTP API and only natives python's modules",
+            add_help=True
+        )
+        
+        parser.add_argument(
+            "-t", 
+            "--thing-name", 
+            help="The name of the thing in AWS",
+            required=True)
+
+        parser.add_argument(
+            "-r", 
+            "--region", 
+            default="eu-west-1", 
+            help="The region where the thing is register in AWS. Default to 'eu-west-1'",
+            required=False
+        )
+
+        parser.add_argument(
+            "-a", 
+            "--aws-access-key-id", 
+            help="AWS access key id that you can find in ~/.aws/credentials",
+            required=True
+        )
+        
+        parser.add_argument(
+            "-s", 
+            "--aws-secret-access-key", 
+            help="AWS secret access key that you can find in ~/.aws/credentials",
+            required=True)
+
+        return parser
+
+    def __init_parameters(self, args) -> None:
+        # Required
+        try:
+            self.thing_name = args.thing_name
+            self.credentials.set_credentials(aws_access_key_id=args.aws_access_key_id, aws_secret_access_key=args.aws_secret_access_key)
+        except Exception as e:
+            sys.exit(e)
+
+        # Not Required
+        if args.region:
+            self.region = args.region
+
+    def init_context_request(self) -> None:
+        args = self.__parser_cmd_line()
+        self.__init_parameters(args)
+
+
+
+    ######################################
+    # CREATE CANONICAL REQUEST
+    ######################################
+
+    def __create_canonical_request(self) -> str:
+        self.canonical_request = CanonicalRequest()
+        self.canonical_request.complete_canonical_string()
+
+    def __hash_canonical_request(self) -> str:
+        self.canonical_request_hash = self.canonical_request.hash_canonical_request()
+
+    def run(self):
+        self.__create_canonical_request()
+        self.__hash_canonical_request()
+
+def main() -> None:
+    create_request = CreateRequest()
+    create_request.init_context_request()
+    create_request.run()
 
 def init_logs() -> None:
     list_params = list(filter(lambda argv : "--" in argv or '-', sys.argv))
@@ -33,95 +134,6 @@ def init_logs() -> None:
 
     logs.set_log_level(is_log_level_debug)
 
-def init_global_vars():
-    global SERVICE, THING_NAME, REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
-    args = parser.parse_args()
-
-    SERVICE = "iotdata"
-
-    print(args)
-
-    THING_NAME = args.thing_name
-    REGION = args.region
-    AWS_ACCESS_KEY_ID = args.aws_access_key_id
-    AWS_SECRET_ACCESS_KEY = args.aws_secret_access_key
-
-
-
-######################################
-# CREATE CANONICAL REQUEST
-######################################
-
-def create_canonical_request(http_method: str, canonical_uri: str, canonical_query_string: str, canonical_headers: list[str], 
-        signed_headers: str, hashed_payload: str) -> str:
-    """
-        http_method 
-        canonical_uri
-        canonical_query_string
-        canonical_headers
-        signed_headers
-        hashed_payload
-    """
-    canonical_request = [http_method]
-    canonical_request.append(canonical_uri)
-    canonical_request.append(canonical_query_string)
-    canonical_request.extend(canonical_headers)
-    canonical_request.append(signed_headers)
-    canonical_request.append(hashed_payload)
-    return "\n".join(canonical_request)
-
-def get_http_method() -> str:
-    # TODO
-    http_method: str = "GET"
-    return http_method.upper()
-
-def get_canonical_uri() -> str:
-    # TODO
-    uri: str = f"/things/{THING_NAME}/shadow"
-    return uri
-
-def get_canonical_query_string() -> str:
-    # TODO is shadow named ?
-    query_string = ""
-    is_shadow_named = False
-
-    if is_shadow_named:
-        shadow_name: str = ""
-        query_string = f"?name={shadow_name}"
-    return query_string
-
-def get_canonical_headers() -> list[str]:
-    host: str = f"host:data-ats.iot.{REGION}.amazonaws.com"
-    date: str = f"x-amz-date:{datetime.datetime.now(tz=pytz.timezone('UTC')).strftime('%Y%m%dT%H%M%SZ')}"
-    # content_type: str = "application/json"
-
-    headers: list[str] = [host, date]
-    headers.sort()
-    headers.append("")
-
-    return headers
-
-def get_signed_headers(canonical_headers: list[str]) -> str:
-    signed_headers: list[str] = []
-    canonical_headers_filter = filter(lambda header : header.startswith(("x-amz", "host")), canonical_headers)
-    for header in list(canonical_headers_filter):
-        if len(header.split(":")) > 0:
-            signed_headers.append(header.split(":")[0])
-        
-    return ";".join(signed_headers)
-
-def get_hashed_payload() -> str:
-    # TODO get payload
-    payload: str = ""
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
-
-
-######################################
-# HASH CANONICAL REQUEST
-######################################
-
-def hash_canonical_request(canonical_request: str) -> str:
-    return hashlib.sha256(canonical_request.encode("utf-8")).hexdigest()
 
 
 ######################################
