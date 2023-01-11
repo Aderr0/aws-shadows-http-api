@@ -17,7 +17,6 @@ class StringToSign:
         self.request_date_time: str = ""
         self.credential_scope: str = ""
         self.hashed_canonical_request: str = ""
-        pass
 
     def complete_string_to_sign(self, canonical_request: CanonicalRequest, canonical_request_hash: str, region: str, service: str) -> None:
         self.__set_algorithm()
