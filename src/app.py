@@ -4,23 +4,10 @@ import requests
 import argparse
 import json
 
-import logs as logs 
 from __init__ import __version__
 from canonical_request import CanonicalRequest
 from string_to_sign import StringToSign
 
-
-
-"""
-    HTTP GET https://endpoint/things/thingName/shadow?name=shadowName
-    Request body: (none)
-
-    HTTP POST https://endpoint/things/thingName/shadow?name=shadowName
-    Request body: request state document
-
-    HTTP DELETE https://endpoint/things/thingName/shadow?name=shadowName
-    Request body: (none)
-"""   
 
 class Credentials:
     def __init__(self, aws_access_key_id = "", aws_secret_access_key = "") -> None:
@@ -209,11 +196,3 @@ if __name__.__eq__("__main__"):
     main()
 
 
-# def init_logs() -> None:
-#     list_params = list(filter(lambda argv : "--" in argv or '-', sys.argv))
-#     try:
-#         is_log_level_debug = len(list(filter(lambda param : "--debug" in param or "-d" in param, list_params))) > 0
-#     except Exception:
-#         is_log_level_debug = False
-
-#     logs.set_log_level(is_log_level_debug)
