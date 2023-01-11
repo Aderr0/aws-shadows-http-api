@@ -38,7 +38,7 @@ class StringToSign:
         self.hashed_canonical_request = canonical_request_hash
 
 
-    def __genrate_string_to_sign(self) -> str:
+    def __generate_string_to_sign(self) -> str:
         string_to_sign_list = [self.algorithm]
         string_to_sign_list.append(self.request_date_time)
         string_to_sign_list.append(self.credential_scope)
@@ -58,7 +58,7 @@ class StringToSign:
             4. ksigning
             5. signature
         """
-        string_to_sign = self.__genrate_string_to_sign()
+        string_to_sign = self.__generate_string_to_sign()
         [d_date, d_region, d_service, d_signing] = self.credential_scope.split("/")
 
         k_date = self.__sign(f"AWS4{aws_secret_access_key}".encode("utf-8"), d_date.encode("utf-8"))
