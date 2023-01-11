@@ -6,6 +6,10 @@ However, in IoT, we don't want to download GB of codes on our things. The more c
 
 I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with natives modules of python.
 
+## Requirements
+
+- Python 3.10 >=
+
 ## How does it works ?
 
 With this repo you can :
