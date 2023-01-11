@@ -32,18 +32,17 @@ class CanonicalRequest:
             date = ""
         return date
 
-    def complete_canonical_request(self, http_method: str, thing_name: str, shadow_name: str | None, region: str, payload: str):
-        self.__set_http_method(http_method)
+    def complete_canonical_request(self, shadow_method: str, thing_name: str, shadow_name: str | None, region: str, payload: str):
+        self.__set_http_method(shadow_method)
         self.__set_canonical_uri(thing_name)
         self.__set_canonical_query_string(shadow_name)
         self.__set_canonical_headers(region)
         self.__set_signed_headers()
         self.__set_hashed_payload(payload)
 
-    def __set_http_method(self, http_method: str) -> None:
-        http_method: str = http_method
+    def __set_http_method(self, shadow_method: str) -> None:
         try:
-            self.http_method = getattr(HTTPMethod, http_method)
+            self.http_method = getattr(HTTPMethod, shadow_method)
         except AttributeError as a_err:
             sys.exit(a_err)
 

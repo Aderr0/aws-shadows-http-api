@@ -45,10 +45,10 @@ class CreateRequest:
 
         self.thing_name: str = ""
         self.region: str = ""
+        self.shadow_method: str = ""
         self.credentials: Credentials = Credentials()
 
         # TODO Set those three variables dynamically
-        self.http_method: str = "GET"
         self.shadow_name: str | None = None
         self.payload: str = ""
 
@@ -80,7 +80,15 @@ class CreateRequest:
             "-t", 
             "--thing-name", 
             help="The name of the thing in AWS",
-            required=True)
+            required=True
+        )
+        
+        parser.add_argument(
+            "-m", 
+            "--method", 
+            help="The shadow method. It is can be either GET, DELETE and UPDATE.",
+            required=True
+        )
 
         parser.add_argument(
             "-r", 
@@ -101,7 +109,8 @@ class CreateRequest:
             "-s", 
             "--aws-secret-access-key", 
             help="AWS secret access key that you can find in ~/.aws/credentials",
-            required=True)
+            required=True
+        )
 
         return parser
 
@@ -109,6 +118,7 @@ class CreateRequest:
         # Required
         try:
             self.thing_name = args.thing_name
+            self.shadow_method = args.method
             self.credentials.set_credentials(aws_access_key_id=args.aws_access_key_id, aws_secret_access_key=args.aws_secret_access_key)
         except Exception as e:
             sys.exit(e)
@@ -130,7 +140,7 @@ class CreateRequest:
     def __create_canonical_request(self) -> None:
         self.canonical_request = CanonicalRequest()
         self.canonical_request.complete_canonical_request(
-            http_method="GET",
+            shadow_method=self.shadow_method,
             thing_name=self.thing_name,
             shadow_name=self.shadow_name,
             region=self.region,
@@ -185,7 +195,7 @@ class CreateRequest:
             "X-Amz-Date": self.string_to_sign.request_date_time,
         })
 
-        return requests.request(self.http_method, url, headers=headers)
+        return requests.request(self.shadow_method, url, headers=headers)
 
 def main() -> None:
     create_request = CreateRequest()

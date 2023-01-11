@@ -1,13 +1,14 @@
 PATH_TO_APP="src"
 
-CONF_FILE=$1
-
 # Check arguments
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
-    echo "$0 <configuration file>"
+    echo "$0 <configuration file> <method>"
     exit 1
 fi
+
+CONF_FILE=$1
+METHOD=$2
 
 if [ ! -f "$CONF_FILE" ]
 then 
@@ -17,4 +18,4 @@ fi
 # load variables
 source "$CONF_FILE"
 
-python3 $PATH_TO_APP/app.py -t $THING_NAME -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY 
+python3 $PATH_TO_APP/app.py -t $THING_NAME -m $METHOD -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY 
