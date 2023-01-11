@@ -189,7 +189,7 @@ class CreateRequest:
             "X-Amz-Date": self.string_to_sign.request_date_time,
         })
 
-        res = requests.request(self.http_method, url, headers=auth)
+        res = requests.request(self.http_method, url, headers=headers)
 
         print(res)
 
@@ -199,6 +199,8 @@ def main() -> None:
     create_request.generate_authorization()
     create_request.execute_request()
 
+if __name__.__eq__("__main__"):
+    main()
 
 
 # def init_logs() -> None:
