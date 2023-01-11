@@ -42,7 +42,7 @@ class CanonicalRequest:
 
     def __set_http_method(self, shadow_method: str) -> None:
         try:
-            self.http_method = getattr(HTTPMethod, shadow_method)
+            self.http_method = getattr(HTTPMethod, shadow_method.upper())
         except AttributeError as a_err:
             sys.exit(a_err)
 
