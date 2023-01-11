@@ -1,3 +1,4 @@
+PATH_TO_APP="src"
 
 CONF_FILE=$1
 
@@ -16,4 +17,4 @@ fi
 # load variables
 source "$CONF_FILE"
 
-python3 app.py -t $THING_NAME -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY 
+python3 $PATH_TO_APP/app.py -t $THING_NAME -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY 
