@@ -24,7 +24,15 @@ class CanonicalRequest:
         self.signed_headers: str = ""
         self.hashed_payload: str = ""
 
-    def complete_canonical_string(self, http_method: str, thing_name: str, shadow_name: str | None, region: str, payload: str):
+    def get_date_from_canonical_headers(self) -> str:
+        try:
+            x_amz_date_header = filter(lambda header : header.startswith("x-amz-date"), self.canonical_headers)
+            date = list(x_amz_date_header)[0].split(":")[1]
+        except Exception as e:
+            date = ""
+        return date
+
+    def complete_canonical_request(self, http_method: str, thing_name: str, shadow_name: str | None, region: str, payload: str):
         self.__set_http_method(http_method)
         self.__set_canonical_uri(thing_name)
         self.__set_canonical_query_string(shadow_name)
