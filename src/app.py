@@ -1,10 +1,6 @@
 
 import sys
-import datetime
-import hashlib
-import hmac
 import requests
-import pytz
 import argparse
 import json
 

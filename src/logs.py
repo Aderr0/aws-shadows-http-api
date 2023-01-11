@@ -1,6 +1,7 @@
 
 # Externals modules
-import logging, sys
+import logging
+import sys
 
 __app_name = sys.argv[0]
 
