@@ -23,18 +23,27 @@ In the TODO list of this repo, there are :
 
 ### GET a Shadow
 
-1. Clone the repo
-2. Copy the file ```conf.template``` and rename it for something else (conf.Aderr0 for example)
-3. Open ```constants``` file and complete it
-4. Execute the script ```script.sh``` with your configuration file name as parameter
+- Shadow Method = GET
+- HTTP Method = GET
+- Host = data-ats.iot.*region*.amazonaws.com
+- URI = /things/*thing_name*/shadow
+- Queries = shadow_name=*shadow_name*
 
 ### UPDATE a Shadow
 
-TODO
+- Shadow Method = UPDATE
+- HTTP Method = POST
+- Host = data-ats.iot.*region*.amazonaws.com
+- URI = /things/*thing_name*/shadow
+- Queries = shadow_name=*shadow_name*
 
 ### DELETE a Shadow
 
-TODO
+- Shadow Method = DELETE
+- HTTP Method = DELETE
+- Host = data-ats.iot.*region*.amazonaws.com
+- URI = /things/*thing_name*/shadow
+- Queries = shadow_name=*shadow_name*
 
 ## How to manipulate AWS HTTP API ?
 
@@ -114,9 +123,9 @@ Where :
 - ```SignedHeaders``` is the same as step 1
 - ```signature``` si the same as step 4
 
-### Example
+## Example
 
-#### My canonical request
+### My canonical request
 
 ``` text
 GET
@@ -136,7 +145,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 - ```SignedHeaders``` - host;x-amz-date
 - ```HashedPayload``` - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 is the hash of an empty payload
 
-#### My canonical request's hash
+### My canonical request's hash
 
 I hashed the entire string from step 1 with ```SHA256``` algorithm.
 
@@ -144,7 +153,7 @@ I hashed the entire string from step 1 with ```SHA256``` algorithm.
 bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7
 ```
 
-#### My string to sign
+### My string to sign
 
 ``` text
 AWS4-HMAC-SHA256
@@ -158,7 +167,7 @@ bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7
 - ```HashedCanonicalRequest``` - 20230109/eu-west-1/iotdata/aws4_request because date/region/service/aws4_request
 - ```RequestDateTime``` - bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7 is from step 2
 
-#### My signature
+### My signature
 
 By following the 5 step to calculate the signature, I get
 
@@ -183,7 +192,7 @@ My result (To protect my data, this hash is fake, but in a correct format) :
 3c6b9506c7fa621d1b51ae669b7b56576904f0c0e6bcd5d4e91f1ccedcb03a42
 ```
 
-#### My new request
+### My new request
 
 I construct this new header :
 
