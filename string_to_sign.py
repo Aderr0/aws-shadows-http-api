@@ -46,11 +46,11 @@ class StringToSign:
 
         return "\n".join(string_to_sign_list)
 
-    def __sign(self, key: str, data: str) -> str:
-        return hmac.new(key.encode("utf-8"), data.encode("utf-8"), hashlib.sha256).hexdigest()
+    def __sign(self, key: bytes, data: bytes, is_signature=False) -> bytes | str:
+        hash = hmac.new(key, data, hashlib.sha256)
+        return hash.hexdigest() if is_signature else hash.digest()
 
     def calculate_signature(self, aws_secret_access_key: str) -> str:
-        string_to_sign = self.__genrate_string_to_sign()
         """
             1. kdate
             2. kregion
@@ -58,11 +58,13 @@ class StringToSign:
             4. ksigning
             5. signature
         """
+        string_to_sign = self.__genrate_string_to_sign()
         [d_date, d_region, d_service, d_signing] = self.credential_scope.split("/")
-        k_date = self.__sign(f"AWS4{aws_secret_access_key}", d_date)
-        k_region = self.__sign(k_date, d_region)
-        k_service = self.__sign(k_region, d_service)
-        k_signing = self.__sign(k_service, d_signing)
-        signature = self.__sign(k_signing, self.__genrate_string_to_sign())
+
+        k_date = self.__sign(f"AWS4{aws_secret_access_key}".encode("utf-8"), d_date.encode("utf-8"))
+        k_region = self.__sign(k_date, d_region.encode("utf-8"))
+        k_service = self.__sign(k_region, d_service.encode("utf-8"))
+        k_signing = self.__sign(k_service, d_signing.encode("utf-8"))
+        signature = self.__sign(k_signing, string_to_sign.encode("utf-8"), is_signature=True)
 
         return signature

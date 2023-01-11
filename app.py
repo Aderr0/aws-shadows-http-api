@@ -177,7 +177,7 @@ class CreateRequest:
     # EXECUTE REQUEST
     ######################################
 
-    def execute_request(self):
+    def execute_request(self) -> requests.Response:
         host = f"data-ats.iot.{self.region}.amazonaws.com"
         url = f"https://{host}{self.canonical_request.canonical_uri}"
 
@@ -189,15 +189,15 @@ class CreateRequest:
             "X-Amz-Date": self.string_to_sign.request_date_time,
         })
 
-        res = requests.request(self.http_method, url, headers=headers)
-
-        print(res)
+        return requests.request(self.http_method, url, headers=headers)
 
 def main() -> None:
     create_request = CreateRequest()
     create_request.init_context_request()
     create_request.generate_authorization()
-    create_request.execute_request()
+    response = create_request.execute_request()
+
+    print(json.dumps(response.json(), indent=2))
 
 if __name__.__eq__("__main__"):
     main()
