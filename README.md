@@ -10,16 +10,7 @@ I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with native
 
 - Python 3.10 >=
 
-## How does it works ?
-
-With this repo you can :
-
-- GET a shadow of a thing
-
-In the TODO list of this repo, there are :
-
-- UPDATE a shadow
-- DELETE a shadow
+## Work with Shadows HTTP API
 
 ### GET a Shadow
 
@@ -69,16 +60,16 @@ HashedPayload
 
 Where :
 
-- ```HTTPMethod``` --> HTTP method (GET, POST,...)
-- ```CanonicalUri``` --> The part of the url between the host and the queries (those after "?")
-- ```CanonicalQueryString``` --> The queries (those after "?") ; Empty string if none
-- ```CanonicalHeaders``` --> Headers in alphabetic order ; ```host``` if HTTP/1.1 and ```:authority``` if HTTP/2 ; others keys start with ```x-amz-*```
-- ```SignedHeaders``` --> Keys 'list from section ```CanonicalHeaders``` finishing with an empty newline
-- ```HashedPayload``` --> Body's payload of HTTP request hashed with the hasing algorithm ```SHA256```
+- `HTTPMethod` --> HTTP method (GET, POST,...)
+- `CanonicalUri` --> The part of the url between the host and the queries (those after "?")
+- `CanonicalQueryString` --> The queries (those after "?") ; Empty string if none
+- `CanonicalHeaders` --> Headers in alphabetic order ; `host` if HTTP/1.1 and `:authority` if HTTP/2 ; others keys start with `x-amz-*`
+- `SignedHeaders` --> Keys 'list from section `CanonicalHeaders` finishing with an empty newline
+- `HashedPayload` --> Body's payload of HTTP request hashed with the hasing algorithm `SHA256`
 
 ### Step 2 - Hash the canonical request
 
-Using the same algorithm as ```HashedPayload``` from the canonical request, hash the entire string of the canonical request.
+Using the same algorithm as `HashedPayload` from the canonical request, hash the entire string of the canonical request.
 
 ### Step 3 - Create a string to sign
 
@@ -91,24 +82,24 @@ CredentialScope
 HashedCanonicalRequest
 ```
 
-- ```Algorithm``` --> The algorithm used to create the hash of the canonical request. For ```SHA256```, the algorithm is ```AWS4-HMAC-SHA256```
-- ```RequestDateTime``` --> The date and time in the following format : *YYYYMMDD*T*hhmmss*Z (T and Z are statics letters, not numbers)
-- ```CredentialScope``` --> The string has the following format : ```YYYYMMDD/region/service/aws4_request```.
-- ```HashedCanonicalRequest``` --> The hash calculated in the previous section
+- `Algorithm` --> The algorithm used to create the hash of the canonical request. For `SHA256`, the algorithm is `AWS4-HMAC-SHA256`
+- `RequestDateTime` --> The date and time in the following format : *YYYYMMDD*T*hhmmss*Z (T and Z are statics letters, not numbers)
+- `CredentialScope` --> The string has the following format : `YYYYMMDD/region/service/aws4_request`.
+- `HashedCanonicalRequest` --> The hash calculated in the previous section
 
 ### Step 4 - Calculate the signature
 
-The signature is calculate in 5 steps. Each step is a part of the ```CredentialScope``` from previous section. They use the hmac-sha256 algorithm :
+The signature is calculate in 5 steps. Each step is a part of the `CredentialScope` from previous section. They use the hmac-sha256 algorithm :
 
-1. ```kDate = hmac-sha256("AWS4" + Key, Date)``` --> Key is your ```AWS Secret Acess Key``` and Date from ```CredentialScope```
-2. ```kRegion = hmac-sha256(kDate, Region)``` -->  Region from ```CredentialScope```
-3. ```kService = hmac-sha256(kRegion, Service)``` --> Service from ```CredentialScope```
-4. ```kSigning = hmac-sha256(kService, "aws4_request")```
-5. ```signature = hmac-sha256(kSigning, string-to-sign)``` --> string-to-sign is the all string from previous step
+1. `kDate = hmac-sha256("AWS4" + Key, Date)` --> Key is your `AWS Secret Acess Key` and Date from `CredentialScope`
+2. `kRegion = hmac-sha256(kDate, Region)` -->  Region from `CredentialScope`
+3. `kService = hmac-sha256(kRegion, Service)` --> Service from `CredentialScope`
+4. `kSigning = hmac-sha256(kService, "aws4_request")`
+5. `signature = hmac-sha256(kSigning, string-to-sign)` --> string-to-sign is the all string from previous step
 
 ### Step 5 - Set up the new request
 
-Add the ```Authorization``` header like this (without the newlines, here they are just use to read easier the value) :
+Add the `Authorization` header like this (without the newlines, here they are just use to read easier the value) :
 
 ``` text
 Authorization: "AWS4-HMAC-SHA256 
@@ -119,13 +110,37 @@ Signature=<signature>"
 
 Where :
 
-- ```CredentialScope``` is the same as step 3
-- ```SignedHeaders``` is the same as step 1
-- ```signature``` si the same as step 4
+- `CredentialScope` is the same as step 3
+- `SignedHeaders` is the same as step 1
+- `signature` si the same as step 4
 
 ## Example
 
-### My canonical request
+### Configure the environment
+
+In this section, we will configure the development environment to execute the script and manipulate your shadows.
+
+1. Clone the repository
+2. Ensure that your Python version is 3.10 or newer.
+3. Copy the configuration file : `cp template.conf my_conf.conf`
+4. Complete it with (no quotes) :
+
+    - THING_NAME: This is the name of the device, for example: my-device
+    - AWS_ACCESS_KEY_ID: This is the access key id gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
+    - AWS_SECRET_ACCESS_KEY: This is the secret access key gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
+
+5. Be sure you have the right to execute the script : `chmod +x script.sh`
+6. Execute the script with the new configuration file and the [Shadow Method](#work-with-shadows-http-api), for example `./script.sh my_conf.conf get`
+
+In the case you chose :
+
+- GET : the application return you the entire Shadow
+- UPDATE : TODO
+- DELETE : the application delete the shadow and return you the request id
+
+### What does the script
+
+#### My canonical request
 
 ``` text
 GET
@@ -138,22 +153,22 @@ host;x-amz-date
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 ```
 
-- ```HTTPMethod``` -  GET method
-- ```CanonicalUri``` - /things/amder-toto/shadow and "amder-toto" is the name of my thing
-- ```CanonicalQueryString``` - empty string because none
-- ```CanonicalHeaders``` - host + x-amz-date + newline
-- ```SignedHeaders``` - host;x-amz-date
-- ```HashedPayload``` - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 is the hash of an empty payload
+- `HTTPMethod` -  GET method
+- `CanonicalUri` - /things/amder-toto/shadow and "amder-toto" is the name of my thing
+- `CanonicalQueryString` - empty string because none
+- `CanonicalHeaders` - host + x-amz-date + newline
+- `SignedHeaders` - host;x-amz-date
+- `HashedPayload` - e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 is the hash of an empty payload
 
-### My canonical request's hash
+#### My canonical request's hash
 
-I hashed the entire string from step 1 with ```SHA256``` algorithm.
+I hashed the entire string from step 1 with `SHA256` algorithm.
 
 ``` text
 bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7
 ```
 
-### My string to sign
+#### My string to sign
 
 ``` text
 AWS4-HMAC-SHA256
@@ -162,12 +177,12 @@ AWS4-HMAC-SHA256
 bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7
 ```
 
-- ```Algorithm``` - AWS4-HMAC-SHA256
-- ```CredentialScope``` - 20230109T092953Z (remind format : YYYYMMDDThhmmssZ ; T and Z are statics letters, not numbers)
-- ```HashedCanonicalRequest``` - 20230109/eu-west-1/iotdata/aws4_request because date/region/service/aws4_request
-- ```RequestDateTime``` - bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7 is from step 2
+- `Algorithm` - AWS4-HMAC-SHA256
+- `CredentialScope` - 20230109T092953Z (remind format : YYYYMMDDThhmmssZ ; T and Z are statics letters, not numbers)
+- `HashedCanonicalRequest` - 20230109/eu-west-1/iotdata/aws4_request because date/region/service/aws4_request
+- `RequestDateTime` - bf90448c05591761ce8f87bcd848604e6ccd81a7b7b8d4df0dd02b4db7b158d7 is from step 2
 
-### My signature
+#### My signature
 
 By following the 5 step to calculate the signature, I get
 
@@ -192,7 +207,7 @@ My result (To protect my data, this hash is fake, but in a correct format) :
 3c6b9506c7fa621d1b51ae669b7b56576904f0c0e6bcd5d4e91f1ccedcb03a42
 ```
 
-### My new request
+#### My new request
 
 I construct this new header :
 
