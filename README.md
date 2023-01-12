@@ -6,6 +6,23 @@ However, in IoT, we don't want to download GB of codes on our things. The more c
 
 I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with natives modules of python.
 
+## Table of Contents
+
+1. [Requirements](#requirements)
+2. [Work with Shadows HTTP API](#work-with-shadows-http-api)
+    1. [GET a Shadow](#get-a-shadow)
+    2. [UPDATE a Shadow](#update-a-shadow)
+    3. [DELETE a Shadow](#delete-a-shadow)
+3. [Create a request](#create-a-request)
+    1. [Step 1 - Create a canonical request](#step-1---create-a-canonical-request)
+    2. [Step 2 - Hash the canonical request](#step-2---hash-the-canonical-request)
+    3. [Step 3 - Create a string to sign](#step-3---create-a-string-to-sign)
+    4. [Step 4 - Calculate the signature](#step-4---calculate-the-signature)
+    5. [Step 5 - Set up the new request](#step-5---set-up-the-new-request)
+4. [Example](#example)
+    1. [Configure the environment](#configure-the-environment)
+    1. [What does the script](#what-does-the-script)
+
 ## Requirements
 
 - Python 3.10 >=
@@ -36,7 +53,7 @@ I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with native
 - URI = /things/*thing_name*/shadow
 - Queries = shadow_name=*shadow_name*
 
-## How to manipulate AWS HTTP API ?
+## Create a request
 
 AWS Documentation :
 
