@@ -44,6 +44,8 @@ I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with native
 - Host = data-ats.iot.*region*.amazonaws.com
 - URI = /things/*thing_name*/shadow
 - Queries = shadow_name=*shadow_name*
+- Headers = content-length (payload length)
+- Body = Payload
 
 ### DELETE a Shadow
 
@@ -116,20 +118,25 @@ The signature is calculate in 5 steps. Each step is a part of the `CredentialSco
 
 ### Step 5 - Set up the new request
 
-Add the `Authorization` header like this (without the newlines, here they are just use to read easier the value) :
+1. Add the `Authorization` header like this (without the newlines, here they are just use to read easier the value) :
 
-``` text
-Authorization: "AWS4-HMAC-SHA256 
-Credential=<aws access key id>/<CredentialScope>,
-SignedHeaders=<SignedHeaders>,
-Signature=<signature>"
-```
+    ``` text
+    Authorization: "AWS4-HMAC-SHA256 
+    Credential=<aws access key id>/<CredentialScope>,
+    SignedHeaders=<SignedHeaders>,
+    Signature=<signature>"
+    ```
 
-Where :
+    Where :
 
-- `CredentialScope` is the same as step 3
-- `SignedHeaders` is the same as step 1
-- `signature` si the same as step 4
+    - `CredentialScope` is the same as step 3
+    - `SignedHeaders` is the same as step 1
+    - `signature` si the same as step 4
+
+2. For UPDATE shadow method : 
+    
+    - Add a `Content-Length` in the header with the payload length as the value
+    - In the body of the request, put the payload
 
 ## Example
 
@@ -142,18 +149,24 @@ In this section, we will configure the development environment to execute the sc
 3. Copy the configuration file : `cp template.conf my_conf.conf`
 4. Complete it with (no quotes) :
 
-    - THING_NAME: This is the name of the device, for example: my-device
     - AWS_ACCESS_KEY_ID: This is the access key id gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
     - AWS_SECRET_ACCESS_KEY: This is the secret access key gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
 
-5. Be sure you have the right to execute the script : `chmod +x script.sh`
-6. Execute the script with the new configuration file and the [Shadow Method](#work-with-shadows-http-api), for example `./script.sh my_conf.conf get`
+5. To update the shadow, copy the shadow state skeleton : `cp shadow_state_skeleton.json shadow_new_state.json` and complete it according what you want
+6. Be sure you have the right to execute the script : `chmod +x script.sh`
+7. Execute the script `./script.sh` and complete with corrects parameters : 
+    
+    - -c *configuration file* (**required**) : The configuration file you just created.
+    - -m *method* (**required**) : The [shadow method](#work-with-shadows-http-api)
+    - -t *thing name* (**required**) : The name of the thing
+    - -s *shadow name* : The name of the shadow (if not a classic shadow)
+    - -d *request state document* : For UPDATE shadow method. The document that contain the new state shadow.
 
 In the case you chose :
 
-- GET : the application return you the entire Shadow
-- UPDATE : TODO
-- DELETE : the application delete the shadow and return you the request id
+- GET : the application returns you the entire Shadow
+- UPDATE : the application returns you the state you sent
+- DELETE : the application deletes the shadow and return you the request id
 
 ### What does the script
 
