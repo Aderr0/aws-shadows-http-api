@@ -1,36 +1,87 @@
+#!/bin/bash
 
+
+
+######################################
+# CONSTANTS
+######################################
 
 PATH_TO_APP="src"
 APP_NAME="app.py"
 
-PARAMS_NUMBER=3
 
-# Check arguments
-if [ $# -lt $(($PARAMS_NUMBER-1)) ]
-then
-    echo "$0 <*configuration file*> <*method*> <shadow state document>"
-    exit 1
-fi
 
-CONF_FILE=$1
-METHOD=$2
-PATH_TO_STATE_DOCUMENT=$3
+######################################
+# ARGUMENTS PARSER
+######################################
 
-if [ ! -f "$CONF_FILE" ]
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -c|--conf-file)
+            CONF_FILE="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -m|--method)
+            METHOD="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -t|--thing-name)
+            THING_NAME="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -s|--shadow-name)
+            SHADOW_NAME="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -d|--state-document)
+            PATH_TO_STATE_DOCUMENT="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        -*|--*)
+            echo "Usage: ./script.sh -c <configuration file> -m <method> -t <thing name> [-s <shadow name>] [-d <request state document>]"
+            echo "Unknown option $1"
+            exit 1
+            ;;
+        *)
+            POSITIONAL_ARGS+=("$1") # save positional arg
+            shift # past argument
+            ;;
+    esac
+done
+
+# set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+if [ ! -f "$CONF_FILE" ] || [ ! "$METHOD" ] || [ ! "$THING_NAME" ]
 then 
-    trace_error "Please create configuration file <$CONF_FILE> from template"
+    echo "Usage: ./script.sh -c <configuration file> -m <method> -t <thing name> [-s <shadow name>] [-d <request state document>]"
     exit 1
 fi 
+
+
+
+######################################
+# MAIN
+######################################
+
 # load variables
 source "$CONF_FILE"
 
+PARAMS="-t $THING_NAME -m $METHOD -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY"
 
-# Check arguments
-if [ $# -eq 3 ]
-then
-    PARAMS="-t $THING_NAME -m $METHOD -sd $PATH_TO_STATE_DOCUMENT -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY"
-else
-    PARAMS="-t $THING_NAME -m $METHOD -a $AWS_ACCESS_KEY_ID -s $AWS_SECRET_ACCESS_KEY"
-fi
+if [ "$SHADOW_NAME" ]
+then 
+    PARAMS="$PARAMS -sn $SHADOW_NAME"
+fi 
+if [ "$PATH_TO_STATE_DOCUMENT" ]
+then 
+    PARAMS="$PARAMS -sd $PATH_TO_STATE_DOCUMENT"
+fi 
 
 python3 $PATH_TO_APP/$APP_NAME $PARAMS 
