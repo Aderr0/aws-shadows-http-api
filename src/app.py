@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 import sys
 import requests
@@ -37,8 +38,6 @@ class CreateRequest:
         self.shadow_method: str = ""
         self.credentials: Credentials = Credentials()
         self.payload: str = ""
-
-        # TODO Set these variable dynamically
         self.shadow_name: str | None = None
 
         self.canonical_request = None
@@ -68,6 +67,7 @@ class CreateRequest:
         parser.add_argument(
             "-t", 
             "--thing-name", 
+            dest="thing_name",
             help="The name of the thing in AWS",
             required=True
         )
@@ -75,13 +75,23 @@ class CreateRequest:
         parser.add_argument(
             "-m", 
             "--method", 
+            dest="method",
             help="The shadow method. It is can be either GET, DELETE and UPDATE.",
             required=True
         )
 
         parser.add_argument(
-            "-sd", 
+            "-s", 
+            "--shadow-name", 
+            dest="shadow_name",
+            help="Path to the shadow request state document. Required only if shadow method is update.",
+            required=False
+        )
+
+        parser.add_argument(
+            "-d", 
             "--state-document", 
+            dest="state_document",
             help="Path to the shadow request state document. Required only if shadow method is update.",
             required=False
         )
@@ -89,7 +99,8 @@ class CreateRequest:
         parser.add_argument(
             "-r", 
             "--region", 
-            default="eu-west-1", 
+            default="eu-west-1",
+            dest="region",
             help="The region where the thing is register in AWS. Default to 'eu-west-1'",
             required=False
         )
@@ -97,13 +108,15 @@ class CreateRequest:
         parser.add_argument(
             "-a", 
             "--aws-access-key-id", 
+            dest="aws_access_key_id",
             help="AWS access key id that you can find in ~/.aws/credentials",
             required=True
         )
         
         parser.add_argument(
-            "-s", 
+            "-k", 
             "--aws-secret-access-key", 
+            dest="aws_secret_access_key",
             help="AWS secret access key that you can find in ~/.aws/credentials",
             required=True
         )
@@ -122,6 +135,8 @@ class CreateRequest:
         # Not Required
         if args.region:
             self.region = args.region
+        if args.shadow_name:
+            self.shadow_name = args.shadow_name
         
         try:
             if getattr(HTTPMethod, self.shadow_method.upper()) == HTTPMethod.UPDATE:
@@ -213,7 +228,7 @@ class CreateRequest:
             "X-Amz-Date": self.string_to_sign.request_date_time,
             "Content-Length": str(len(self.payload))
         })
-        
+
         return requests.request(self.canonical_request.http_method, url, headers=headers, data=self.payload)
 
 def main() -> None:
