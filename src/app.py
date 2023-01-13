@@ -9,7 +9,7 @@ import os
 from __init__ import __version__
 from canonical_request import CanonicalRequest
 from string_to_sign import StringToSign
-from constants import HTTPMethod
+from constants import HTTPMethod, AVAILABLE_REGION
 
 
 class Credentials:
@@ -134,7 +134,13 @@ class CreateRequest:
 
         # Not Required
         if args.region:
-            self.region = args.region
+            if args.region not in AVAILABLE_REGION:
+                sys.exit(f"'{args.region}' is not an available region.\n" +
+                    "See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html " +
+                    "for availables regions"
+                )
+            else:
+                self.region = args.region
         if args.shadow_name:
             self.shadow_name = args.shadow_name
         

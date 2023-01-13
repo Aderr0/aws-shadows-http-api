@@ -34,6 +34,11 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
+        -r|--region)
+            REGION="$2"
+            shift # past argument
+            shift # past value
+            ;;
         -s|--shadow-name)
             SHADOW_NAME="$2"
             shift # past argument
@@ -60,7 +65,7 @@ done
 
 if [ ! -f "$CONF_FILE" ] || [ ! "$METHOD" ] || [ ! "$THING_NAME" ]
 then 
-    echo "Usage: ./script.sh -c <configuration file> -m <method> -t <thing name> [-s <shadow name>] [-d <request state document>]"
+    echo "Usage: ./script.sh -c <configuration file> -m <method> -t <thing name> [-r <region>] [-s <shadow name>] [-d <request state document>]"
     exit 1
 fi 
 
@@ -75,6 +80,10 @@ source "$CONF_FILE"
 
 PARAMS="-t $THING_NAME -m $METHOD -a $AWS_ACCESS_KEY_ID -k $AWS_SECRET_ACCESS_KEY"
 
+if [ "$REGION" ]
+then 
+    PARAMS="$PARAMS -r $REGION"
+fi 
 if [ "$SHADOW_NAME" ]
 then 
     PARAMS="$PARAMS -s $SHADOW_NAME"

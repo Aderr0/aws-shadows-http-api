@@ -144,29 +144,30 @@ The signature is calculate in 5 steps. Each step is a part of the `CredentialSco
 
 In this section, we will configure the development environment to execute the script and manipulate your shadows.
 
-1. Clone the repository
-2. Ensure that your Python version is 3.10 or newer.
-3. Copy the configuration file : `cp template.conf my_conf.conf`
+1. Clone the repository ;
+2. Ensure that your Python version is 3.10 or newer ;
+3. Copy the configuration file : `cp template.conf my_conf.conf` ;
 4. Complete it with (no quotes) :
 
-    - AWS_ACCESS_KEY_ID: This is the access key id gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
-    - AWS_SECRET_ACCESS_KEY: This is the secret access key gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI
+    - AWS_ACCESS_KEY_ID: This is the access key id gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI ;
+    - AWS_SECRET_ACCESS_KEY: This is the secret access key gave by AWS, you can find the value in ~/.aws/credentials file if you have AWS CLI.
 
-5. To update the shadow, copy the shadow state skeleton : `cp shadow_state_skeleton.json shadow_new_state.json` and complete it according what you want
-6. Be sure you have the right to execute the script : `chmod +x script.sh`
+5. To update the shadow, copy the shadow state skeleton : `cp shadow_state_skeleton.json shadow_new_state.json` and complete it according what you want ;
+6. Be sure you have the right to execute the script : `chmod +x script.sh` ;
 7. Execute the script `./script.sh` and complete with corrects parameters : 
     
-    - -c *configuration file* (**required**) : The configuration file you just created.
-    - -m *method* (**required**) : The [shadow method](#work-with-shadows-http-api)
-    - -t *thing name* (**required**) : The name of the thing
-    - -s *shadow name* : The name of the shadow (if not a classic shadow)
+    - -c *configuration file* (**required**) : The configuration file you just created ;
+    - -m *method* (**required**) : The [shadow method](#work-with-shadows-http-api) ;
+    - -t *thing name* (**required**) : The name of the thing ;
+    - -r *region* : The region where the thing is register. Default to `eu-west-1` ;
+    - -s *shadow name* : The name of the shadow (if not a classic shadow) ;
     - -d *request state document* : For UPDATE shadow method. The document that contain the new state shadow.
 
 In the case you chose :
 
-- GET : the application returns you the entire Shadow
-- UPDATE : the application returns you the state you sent
-- DELETE : the application deletes the shadow and return you the request id
+- GET : the application returns you the entire Shadow ;
+- UPDATE : the application returns you the state you sent ;
+- DELETE : the application deletes the shadow and return you the request id.
 
 ### What does the script
 
