@@ -53,7 +53,7 @@ class CanonicalRequest:
         query_string = ""
 
         if shadow_name is not None:
-            query_string = f"?name={shadow_name}"
+            query_string = f"name={shadow_name}"
 
         self.canonical_query_string = query_string
 
