@@ -1,0 +1,10 @@
+{
+	"state": {
+		"desired": {
+			"desired_key": "value"
+		},
+		"reported": {
+			"reported_key": "value"
+		}
+	}
+}

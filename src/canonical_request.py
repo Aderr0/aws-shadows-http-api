@@ -28,7 +28,7 @@ class CanonicalRequest:
         try:
             x_amz_date_header = filter(lambda header : header.startswith("x-amz-date"), self.canonical_headers)
             date = list(x_amz_date_header)[0].split(":")[1]
-        except Exception as e:
+        except Exception:
             date = ""
         return date
 
@@ -79,7 +79,7 @@ class CanonicalRequest:
 
     def __set_hashed_payload(self, payload: str) -> str:
         self.hashed_payload = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-    
+
 
     def hash_canonical_request(self) -> str:
         canonical_string = self.__generate_canonical_string()

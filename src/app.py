@@ -3,10 +3,12 @@ import sys
 import requests
 import argparse
 import json
+import os
 
 from __init__ import __version__
 from canonical_request import CanonicalRequest
 from string_to_sign import StringToSign
+from constants import HTTPMethod
 
 
 class Credentials:
@@ -34,10 +36,10 @@ class CreateRequest:
         self.region: str = ""
         self.shadow_method: str = ""
         self.credentials: Credentials = Credentials()
-
-        # TODO Set those three variables dynamically
-        self.shadow_name: str | None = None
         self.payload: str = ""
+
+        # TODO Set these variable dynamically
+        self.shadow_name: str | None = None
 
         self.canonical_request = None
         self.canonical_request_hash = None
@@ -78,6 +80,13 @@ class CreateRequest:
         )
 
         parser.add_argument(
+            "-sd", 
+            "--state-document", 
+            help="Path to the shadow request state document. Required only if shadow method is update.",
+            required=False
+        )
+
+        parser.add_argument(
             "-r", 
             "--region", 
             default="eu-west-1", 
@@ -113,6 +122,28 @@ class CreateRequest:
         # Not Required
         if args.region:
             self.region = args.region
+        
+        try:
+            if getattr(HTTPMethod, self.shadow_method.upper()) == HTTPMethod.UPDATE:
+                if args.state_document:
+                    self.payload = self.__get_payload_from_state_document(args.state_document)
+                else:
+                    raise argparse.ArgumentError("Argument missing", "With an UPDATE shadow method, a path to the state document have to be passed")
+        except AttributeError as a_err:
+            sys.exit(a_err)
+        except Exception as e:
+            sys.exit(e)
+
+    def __get_payload_from_state_document(self, state_document_path):
+        if not os.path.exists(state_document_path):
+            raise FileExistsError(f"Path {state_document_path} does not exist")
+        else:
+            try:
+                with open(state_document_path) as state_document:
+                    state_document_content: str = str(json.load(state_document)).replace("'", "\"")
+                    return state_document_content
+            except Exception:
+                raise Exception("Error while reading request state document")
 
     def init_context_request(self) -> None:
         args = self.__parser_cmd_line()
@@ -180,9 +211,10 @@ class CreateRequest:
         headers = self.authorization
         headers.update({
             "X-Amz-Date": self.string_to_sign.request_date_time,
+            "Content-Length": str(len(self.payload))
         })
-
-        return requests.request(self.shadow_method, url, headers=headers)
+        
+        return requests.request(self.canonical_request.http_method, url, headers=headers, data=self.payload)
 
 def main() -> None:
     create_request = CreateRequest()
