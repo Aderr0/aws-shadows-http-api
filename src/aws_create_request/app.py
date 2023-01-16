@@ -6,10 +6,9 @@ import argparse
 import json
 import os
 
-from __init__ import __version__
-from canonical_request import CanonicalRequest
-from string_to_sign import StringToSign
-from constants import HTTPMethod, AVAILABLE_REGION
+from aws_create_request.canonical_request import CanonicalRequest
+from aws_create_request.string_to_sign import StringToSign
+from aws_create_request.constants import HTTPMethod, AVAILABLE_REGION
 
 
 class Credentials:
@@ -236,16 +235,5 @@ class CreateRequest:
         })
 
         return requests.request(self.canonical_request.http_method, url, headers=headers, data=self.payload)
-
-def main() -> None:
-    create_request = CreateRequest()
-    create_request.init_context_request()
-    create_request.generate_authorization()
-    response = create_request.execute_request()
-
-    print(json.dumps(response.json(), indent=2))
-
-if __name__.__eq__("__main__"):
-    main()
 
 

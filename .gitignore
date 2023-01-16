@@ -2,3 +2,6 @@ __pycache__
 
 *conf*
 !template.conf
+
+build/
+*.egg-info

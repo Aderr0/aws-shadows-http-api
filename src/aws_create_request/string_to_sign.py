@@ -2,7 +2,7 @@
 import hmac
 import hashlib
 
-from canonical_request import CanonicalRequest
+from aws_create_request.canonical_request import CanonicalRequest
 
 class StringToSign:
     """

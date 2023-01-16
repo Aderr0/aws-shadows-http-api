@@ -4,7 +4,7 @@ import datetime
 import pytz
 import hashlib
 
-from constants import HTTPMethod
+from aws_create_request.constants import HTTPMethod
 
 class CanonicalRequest:
     """
