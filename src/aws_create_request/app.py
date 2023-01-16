@@ -237,3 +237,17 @@ class CreateRequest:
         return requests.request(self.canonical_request.http_method, url, headers=headers, data=self.payload)
 
 
+def get_response_from_request() -> dict:
+    create_request = CreateRequest()
+    create_request.init_context_request()
+    create_request.generate_authorization()
+    res_execution = create_request.execute_request()
+
+    response = json.dumps(res_execution.json(), indent=2)
+
+    print(response)
+    return response
+
+
+if __name__.__eq__("__main__"):
+    get_response_from_request()
