@@ -6,7 +6,7 @@
 # CONSTANTS
 ######################################
 
-PATH_TO_APP="src"
+PATH_TO_APP="src/aws_create_request"
 APP_NAME="app.py"
 
 

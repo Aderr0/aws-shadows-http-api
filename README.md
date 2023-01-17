@@ -254,3 +254,31 @@ And my request is :
     'Authorization': 'AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE/20230109/eu-west-1/iotdata/aws4_request SignedHeaders=host;x-amz-date Signature=3c6b9506c7fa621d1b51ae669b7b56576904f0c0e6bcd5d4e91f1ccedcb03a42',
     'X-Amz-Date': '20230109T092953Z'
 }
+
+## Help the development
+
+As I support opensource and collaboration, everyone can help this project to develop. To do so : 
+
+1. Fork the repo and clone it on your computer ; 
+2. Install the aws_create_request module with :
+
+    ``` bash
+    pip install .
+    ```
+
+3. Improve the application in your way :)
+4. Apply the tests in tests directory : 
+
+    - To apply every tests : 
+    
+        ``` console
+        python3 -m unittest -v tests/all_tests.py
+        ```
+    
+    - To apply a specific group of tests : 
+        
+        ``` console
+        python3 -m unittest -v tests/<test you want>.py
+        ```
+        
+5. Create a pull request
