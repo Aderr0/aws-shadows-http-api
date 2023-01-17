@@ -27,6 +27,24 @@ I wanted to manipulte a part of AWS IoT Core : AWS Shadows. But only with native
 
 - Python 3.10 >=
 
+## TODO List
+
+### To complete the application
+
+- Continue tests development
+- Use X.509 certifcate to authentificate things ([Documentation AWS](https://aws.amazon.com/fr/about-aws/whats-new/2019/03/aws-iot-core-now-supports-http-rest-apis-with-x509-client-certificate-based-authentication-on-port-443/))
+- Look for temporary session ([Documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html))
+
+### To go further
+
+- Mettre en place un projet similaire avec `Busybox`
+
+    --> https://www.xml.com/pub/a/2004/12/15/telnet-REST.html
+    --> https://ma.ttwagner.com/how-to-telnet-to-port-443-to-test-https-sites/
+    --> https://superuser.com/questions/346958/can-the-telnet-or-netcat-clients-communicate-over-ssl
+    --> https://boxmatrix.info/wiki/BusyBox-Commands
+    --> http://lists.busybox.net/pipermail/busybox/2017-January/085129.html
+
 ## Work with Shadows HTTP API
 
 ### GET a Shadow
