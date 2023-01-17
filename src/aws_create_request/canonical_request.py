@@ -52,7 +52,7 @@ class CanonicalRequest:
     def __set_canonical_query_string(self, shadow_name: str | None) -> None:
         query_string = ""
 
-        if shadow_name is not None:
+        if shadow_name is not None or len(shadow_name) == 0:
             query_string = f"name={shadow_name}"
 
         self.canonical_query_string = query_string
@@ -60,7 +60,6 @@ class CanonicalRequest:
     def __set_canonical_headers(self, region: str) -> None:
         host: str = f"host:data-ats.iot.{region}.amazonaws.com"
         date: str = f"x-amz-date:{datetime.datetime.now(tz=pytz.timezone('UTC')).strftime('%Y%m%dT%H%M%SZ')}"
-        # content_type: str = "application/json"
 
         headers: list[str] = [host, date]
         headers.sort()
